@@ -22,12 +22,18 @@ def tasks():
 @main.route('/task/new', methods=['POST'])
 @login_required
 def new_task():
-    title = request.form.get('title')
-    description = request.form.get('description')
+    title = request.form.get('title', '').strip()
+    description = request.form.get('description', '').strip()
     assignee_ids = request.form.getlist('assignees')
 
     if not title:
         flash('Заголовок обязателен')
+        return redirect(url_for('main.tasks'))
+    if len(title) > 200:
+        flash('Заголовок слишком длинный (макс. 200 символов)')
+        return redirect(url_for('main.tasks'))
+    if len(description) > 2000:
+        flash('Описание слишком длинное (макс. 2000 символов)')
         return redirect(url_for('main.tasks'))
 
     task = Task(
@@ -48,10 +54,56 @@ def new_task():
                     assignees.append(user)
             task.assignees.extend(assignees)
         except (ValueError, TypeError):
-            pass
+            flash('Некорректные данные о пользователях')
+            return redirect(url_for('main.tasks'))
 
     db.session.commit()
     flash('Задача создана')
+    return redirect(url_for('main.tasks'))
+
+@main.route('/task/<int:id>/edit', methods=['POST'])
+@login_required
+def edit_task(id):
+    task = Task.query.get_or_404(id)
+    if task.user_id != current_user.id:
+        flash('Нет прав на редактирование этой задачи')
+        return redirect(url_for('main.tasks'))
+        
+    title = request.form.get('title', '').strip()
+    description = request.form.get('description', '').strip()
+    assignee_ids = request.form.getlist('assignees')
+
+    if not title:
+        flash('Заголовок обязателен')
+        return redirect(url_for('main.tasks'))
+    if len(title) > 200:
+        flash('Заголовок слишком длинный (макс. 200 символов)')
+        return redirect(url_for('main.tasks'))
+    if len(description) > 2000:
+        flash('Описание слишком длинное (макс. 2000 символов)')
+        return redirect(url_for('main.tasks'))
+
+    task.title = title
+    task.description = description
+    
+    if assignee_ids:
+        try:
+            assignee_ids = [int(i) for i in assignee_ids]
+            assignees = []
+            for aid in assignee_ids:
+                user = User.query.get(aid)
+                if user and current_user.can_assign_to(user):
+                    assignees.append(user)
+            task.assignees.clear()
+            task.assignees.extend(assignees)
+        except (ValueError, TypeError):
+            flash('Некорректные данные о пользователях')
+            return redirect(url_for('main.tasks'))
+    else:
+        task.assignees.clear()
+
+    db.session.commit()
+    flash('Задача обновлена')
     return redirect(url_for('main.tasks'))
 
 @main.route('/task/<int:id>/complete', methods=['POST'])
@@ -65,6 +117,18 @@ def complete_task(id):
         task.completed_at = datetime.utcnow()
         db.session.commit()
         flash('Задача отмечена как выполненная')
+    return redirect(url_for('main.tasks'))
+
+@main.route('/task/<int:id>/delete', methods=['POST'])
+@login_required
+def delete_task(id):
+    task = Task.query.get_or_404(id)
+    if task.user_id != current_user.id:
+        flash('Нет прав на удаление этой задачи')
+        return redirect(url_for('main.tasks'))
+    db.session.delete(task)
+    db.session.commit()
+    flash('Задача удалена')
     return redirect(url_for('main.tasks'))
 
 @main.route('/admin')
