@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Управление пользователями</h2>
+<p>Только администратор (уровень 0) может изменять уровни доступа.</p>
+
+<table border="1" cellpadding="8" style="border-collapse:collapse; margin-top:15px;">
+    <thead>
+        <tr>
+            <th>Пользователь</th>
+            <th>Текущий уровень</th>
+            <th>Новый уровень</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for user in users %}
+        <tr>
+            <td>{{ user.username }}</td>
+            <td>{{ user.access_level }}</td>
+            <td>
+                <form method="post" action="{{ url_for('main.set_user_access_level', user_id=user.id) }}" style="display:inline;">
+                    <input type="number" name="level" value="{{ user.access_level }}" min="0" style="width:60px;">
+                    <button type="submit">Сохранить</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<a href="{{ url_for('main.tasks') }}">← Назад к задачам</a>
+{% endblock %}

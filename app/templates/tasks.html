@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Ваши задачи</h2>
+<a href="#" onclick="document.getElementById('new-task-form').style.display='block'">+ Новая задача</a>
+
+<div id="new-task-form" style="display:none; margin-top:20px; padding:15px; border:1px solid #ccc; background:#f9f9f9;">
+    <h3>Создать задачу</h3>
+    <form method="post" action="{{ url_for('main.new_task') }}">
+        <input type="text" name="title" placeholder="Заголовок" required style="width:100%; padding:8px; margin:5px 0;">
+        <textarea name="description" placeholder="Описание" style="width:100%; padding:8px; margin:5px 0; height:80px;"></textarea>
+        <p><strong>Назначить пользователям:</strong></p>
+        {% for user in users %}
+            {% if current_user.can_assign_to(user) %}
+                <label style="display:block; margin:4px 0;">
+                    <input type="checkbox" name="assignees" value="{{ user.id }}"> {{ user.username }} (L{{ user.access_level }})
+                </label>
+            {% endif %}
+        {% endfor %}
+        <button type="submit" style="margin-top:10px;">Создать задачу</button>
+        <button type="button" onclick="document.getElementById('new-task-form').style.display='none'" style="margin-left:10px;">Отмена</button>
+    </form>
+</div>
+
+{% if tasks %}
+<ul style="list-style:none; padding:0;">
+{% for task in tasks %}
+    <li style="border:1px solid #ddd; margin:10px 0; padding:12px; background:white;">
+        <div>
+            <strong>{{ task.title }}</strong>
+            {% if task.completed_at %}
+                <span style="color:green; font-weight:bold;">✅ Выполнено: {{ task.completed_at.strftime('%d.%m.%Y %H:%M') }}</span>
+            {% else %}
+                <form method="post" action="{{ url_for('main.complete_task', id=task.id) }}" style="display:inline;">
+                    <button type="submit" style="font-size:0.9em; padding:3px 8px;">Выполнено</button>
+                </form>
+            {% endif %}
+        </div>
+        {% if task.description %}
+            <p style="margin:8px 0; color:#555;">{{ task.description }}</p>
+        {% endif %}
+        <p style="font-size:0.9em; color:#777;">Автор: {{ task.author.username }}</p>
+        <p style="font-size:0.9em; color:#777;">
+            Назначено:
+            {% for u in task.assignees %}
+                {{ u.username }} (L{{ u.access_level }}){% if not loop.last %}, {% endif %}
+            {% else %}
+                никому
+            {% endfor %}
+        </p>
+    </li>
+{% endfor %}
+</ul>
+{% else %}
+<p>Нет задач.</p>
+{% endif %}
+{% endblock %}
