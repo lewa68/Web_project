@@ -78,6 +78,8 @@ class Task(db.Model):
     subtasks = db.relationship('Subtask', back_populates='task', cascade='all, delete-orphan')
 
     def is_visible_to(self, user):
+        if user.is_admin():
+            return True
         return user.id == self.user_id or user in self.assignees
 
     def is_overdue(self):
@@ -122,9 +124,13 @@ class Task(db.Model):
         }
 
     def can_mark_as_done(self, user):
+        if user.is_admin():
+            return True
         return user in self.assignees
 
     def can_approve(self, user):
+        if user.is_admin():
+            return True
         return user.id == self.user_id
 
     def mark_as_done(self):
