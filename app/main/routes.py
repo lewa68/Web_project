@@ -69,6 +69,20 @@ def delete_project(id):
     flash('Проект удалён')
     return redirect(url_for('main.projects'))
 
+@main.route('/project/<int:id>')
+@login_required
+def view_project(id):
+    project = Project.query.get_or_404(id)
+    tasks = project.tasks.all()
+    return render_template('project_detail.html', project=project, tasks=tasks)
+
+@main.route('/project/<int:project_id>/new_task')
+@login_required
+def new_task_from_project(project_id):
+    project = Project.query.get_or_404(project_id)
+    return redirect(url_for('main.tasks'))
+
+
 @main.route('/tasks')
 @login_required
 def tasks():
