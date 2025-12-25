@@ -229,7 +229,7 @@ def add_subtask(id):
 def update_subtask(id):
     subtask = Subtask.query.get_or_404(id)
     task = subtask.task
-    
+
     if not (current_user.is_admin() or task.user_id == current_user.id):
         return jsonify({'error': 'Access denied'}), 403
     
@@ -244,7 +244,7 @@ def update_subtask(id):
 def delete_subtask(id):
     subtask = Subtask.query.get_or_404(id)
     task = subtask.task
-    
+
     if not (current_user.is_admin() or task.user_id == current_user.id):
         return jsonify({'error': 'Access denied'}), 403
     

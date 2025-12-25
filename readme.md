@@ -75,12 +75,17 @@ python run.py
 
 ### Эндпоинты задач
 
-- `GET /api/tasks` — список всех задач (видимых пользователю)
-- `GET /api/tasks/<id>` — получить задачу по ID
-- `POST /api/tasks` — создать задачу
-- `PUT /api/tasks/<id>` — обновить задачу
-- `DELETE /api/tasks/<id>` — удалить задачу
-- `PUT /api/tasks/<id>/complete` — отметить задачу как выполненную
+- `GET /api/tasks` - список всех задач (видимых пользователю)
+- `GET /api/tasks/<id>` - получить задачу по ID
+- `POST /api/tasks` - создать задачу
+- `PUT /api/tasks/<id>` - обновить задачу
+- `DELETE /api/tasks/<id>` - удалить задачу
+- `PUT /api/tasks/<id>/complete` - отметить задачу как выполненную
+- `POST /api/tasks/<id>/comments` — добавить комментарий к задаче
+- `DELETE /api/comments/<id>` — удалить комментарий
+- `POST /api/tasks/<id>/subtasks` — добавить подзадачу к задаче
+- `PUT /api/subtasks/<id>` — обновить подзадачу
+- `DELETE /api/subtasks/<id>` — удалить подзадачу
 
 ### Примеры запросов
 

@@ -104,7 +104,7 @@ def tasks():
     due_today = request.args.get('due_today')
     if due_today == 'true':
         today = date.today()
-        query = query.filter(db.func.date(Task.created_at) == today)
+        query = query.filter(Task.deadline == today)
 
     tasks = query.all()
     projects = Project.query.all()
@@ -382,7 +382,7 @@ def delete_comment(id):
 @login_required
 def add_subtask(id):
     task = Task.query.get_or_404(id)
-    if task.user_id != current_user.id:
+    if not (current_user.is_admin() or task.user_id == current_user.id):
         flash('Нет прав')
         return redirect(url_for('main.view_task', id=id))
 
@@ -401,7 +401,7 @@ def add_subtask(id):
 def toggle_subtask(id):
     subtask = Subtask.query.get_or_404(id)
     task_id = subtask.task_id
-    if subtask.task.user_id != current_user.id:
+    if not (current_user.is_admin() or subtask.task.user_id == current_user.id):
         flash('Нет прав')
         return redirect(url_for('main.view_task', id=task_id))
     subtask.completed = not subtask.completed
@@ -413,7 +413,7 @@ def toggle_subtask(id):
 def delete_subtask(id):
     subtask = Subtask.query.get_or_404(id)
     task_id = subtask.task_id
-    if subtask.task.user_id != current_user.id:
+    if not (current_user.is_admin() or subtask.task.user_id == current_user.id):
         flash('Нет прав')
         return redirect(url_for('main.view_task', id=task_id))
     db.session.delete(subtask)
