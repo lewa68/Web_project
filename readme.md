@@ -81,11 +81,11 @@ python run.py
 - `PUT /api/tasks/<id>` - обновить задачу
 - `DELETE /api/tasks/<id>` - удалить задачу
 - `PUT /api/tasks/<id>/complete` - отметить задачу как выполненную
-- `POST /api/tasks/<id>/comments` — добавить комментарий к задаче
-- `DELETE /api/comments/<id>` — удалить комментарий
-- `POST /api/tasks/<id>/subtasks` — добавить подзадачу к задаче
-- `PUT /api/subtasks/<id>` — обновить подзадачу
-- `DELETE /api/subtasks/<id>` — удалить подзадачу
+- `POST /api/tasks/<id>/comments` - добавить комментарий к задаче
+- `DELETE /api/comments/<id>` - удалить комментарий
+- `POST /api/tasks/<id>/subtasks` - добавить подзадачу к задаче
+- `PUT /api/subtasks/<id>` - обновить подзадачу
+- `DELETE /api/subtasks/<id>` - удалить подзадачу
 
 ### Примеры запросов
 
