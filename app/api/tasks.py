@@ -206,41 +206,48 @@ def delete_comment(id):
 @login_required
 def add_subtask(id):
     task = Task.query.get_or_404(id)
-    if task.user_id != current_user.id:
-        return jsonify({'error': 'Access denied'}), 403
 
+    if not (current_user.is_admin() or task.user_id == current_user.id):
+        return jsonify({'error': 'Access denied'}), 403
+    
     data = request.get_json() or {}
     title = data.get('title', '').strip()
+    
     if not title:
         return jsonify({'error': 'Title is required'}), 400
     if len(title) > 100:
         return jsonify({'error': 'Title too long'}), 400
-
+    
     subtask = Subtask(title=title, completed=False, task_id=id)
     db.session.add(subtask)
     db.session.commit()
     return jsonify(subtask.to_dict()), 201
+
 
 @api.route('/subtasks/<int:id>', methods=['PUT'])
 @login_required
 def update_subtask(id):
     subtask = Subtask.query.get_or_404(id)
     task = subtask.task
-    if task.user_id != current_user.id:
+    
+    if not (current_user.is_admin() or task.user_id == current_user.id):
         return jsonify({'error': 'Access denied'}), 403
-
+    
     data = request.get_json() or {}
     subtask.completed = bool(data.get('completed', subtask.completed))
     db.session.commit()
     return jsonify(subtask.to_dict())
+
 
 @api.route('/subtasks/<int:id>', methods=['DELETE'])
 @login_required
 def delete_subtask(id):
     subtask = Subtask.query.get_or_404(id)
     task = subtask.task
-    if task.user_id != current_user.id:
+    
+    if not (current_user.is_admin() or task.user_id == current_user.id):
         return jsonify({'error': 'Access denied'}), 403
+    
     db.session.delete(subtask)
     db.session.commit()
     return jsonify({'message': 'Subtask deleted'}), 200
