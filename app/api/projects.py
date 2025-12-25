@@ -28,6 +28,7 @@ def create_project():
         
     project = Project(
         name=name,
+        user_id=current_user.id,
         description=data.get('description', '').strip(),
         color=data.get('color', '#3498db')
     )
