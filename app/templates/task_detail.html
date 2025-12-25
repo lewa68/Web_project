@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block content %}
+<div style="max-width:800px; margin:0 auto;">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px;">
+        <div>
+            <h2>{{ task.get_priority_emoji() }} {{ task.title }}</h2>
+            <p style="color:#7f8c8d; margin:5px 0;">
+                Автор: {{ task.author.username }} |
+                Создано: {{ task.created_at.strftime('%d.%m.%Y %H:%M') }} |
+                Статус: <span style="color:{{ task.get_status_color() }};">{{ task.get_status_display() }}</span>
+            </p>
+        </div>
+        <div>
+            {% if task.status == 'todo' and task.can_mark_as_done(current_user) %}
+                <form method="post" action="{{ url_for('main.mark_task_done', id=task.id) }}" style="display:inline;">
+                    <button type="submit">Начать работу</button>
+                </form>
+            {% elif task.status == 'in_progress' and task.can_mark_as_done(current_user) %}
+                <form method="post" action="{{ url_for('main.mark_task_done', id=task.id) }}" style="display:inline;">
+                    <button type="submit">Отправить на проверку</button>
+                </form>
+            {% elif task.status == 'review' and task.can_approve(current_user) %}
+                <form method="post" action="{{ url_for('main.approve_task', id=task.id) }}" style="display:inline;">
+                    <button type="submit" style="background:#2ecc71;">Подтвердить выполнение</button>
+                </form>
+            {% endif %}
+            
+            {% if task.can_approve(current_user) %}
+                <form method="post" action="{{ url_for('main.delete_task', id=task.id) }}" style="display:inline; margin-left:10px;">
+                    <button type="submit" onclick="return confirm('Удалить задачу?')" style="background:#e74c3c;">Удалить</button>
+                </form>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if task.description %}
+    <div style="background:#f8f9fa; padding:15px; border-radius:4px; margin:20px 0;">
+        <h3>Описание</h3>
+        <p>{{ task.description }}</p>
+    </div>
+    {% endif %}
+    
+    <div style="margin:20px 0;">
+        <h3>Подзадачи ({{ task.subtasks|selectattr('completed', 'equalto', true)|list|length }}/{{ task.subtasks|length }})</h3>
+        {% if task.subtasks %}
+            <div style="margin-top:10px;">
+                {% for sub in task.subtasks %}
+                    <div style="display:flex; align-items:center; margin:8px 0;">
+                        <form method="post" action="{{ url_for('main.toggle_subtask', id=sub.id) }}" style="margin-right:10px;">
+                            <input type="checkbox" {% if sub.completed %}checked{% endif %} onchange="this.form.submit()" style="width:18px; height:18px;">
+                        </form>
+                        <span style="{% if sub.completed %}text-decoration:line-through; color:#95a5a6;{% endif %}">
+                            {{ sub.title }}
+                        </span>
+                        <form method="post" action="{{ url_for('main.delete_subtask', id=sub.id) }}" style="margin-left:15px;">
+                            <button type="submit" style="font-size:0.8em; padding:2px 6px; background:#e74c3c; color:white; border:none; border-radius:3px;">✕</button>
+                        </form>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        
+        <form method="post" action="{{ url_for('main.add_subtask', id=task.id) }}" style="margin-top:15px;">
+            <input type="text" name="title" placeholder="Добавить подзадачу" style="width:300px; padding:8px; margin-right:10px;" required>
+            <button type="submit">+</button>
+        </form>
+    </div>
+
+    <div style="margin:30px 0;">
+        <h3>Комментарии ({{ task.comments|length }})</h3>
+        {% for comment in task.comments %}
+            <div style="background:#f8f9fa; padding:12px; border-radius:4px; margin:10px 0;">
+                <div style="display:flex; justify-content:space-between; color:#7f8c8d; font-size:0.9em;">
+                    <strong>{{ comment.author }}</strong>
+                    <span>{{ comment.created_at.strftime('%d.%m.%Y %H:%M') }}</span>
+                </div>
+                <p style="margin:8px 0;">{{ comment.content }}</p>
+                {% if comment.author_id == current_user.id or current_user.is_admin() %}
+                    <form method="post" action="{{ url_for('main.delete_comment', id=comment.id) }}" style="display:inline;">
+                        <button type="submit" style="font-size:0.8em; color:#e74c3c; background:none; border:none; text-decoration:underline;">Удалить</button>
+                    </form>
+                {% endif %}
+            </div>
+        {% endfor %}
+        
+        <form method="post" action="{{ url_for('main.add_comment', id=task.id) }}" style="margin-top:20px;">
+            <textarea name="content" placeholder="Ваш комментарий" style="width:100%; height:80px; padding:10px; margin-bottom:10px;" required></textarea>
+            <button type="submit">Добавить комментарий</button>
+        </form>
+    </div>
+
+    <a href="{{ url_for('main.tasks') }}" style="display:inline-block; margin-top:20px;">← Назад к задачам</a>
+</div>
+{% endblock %}

@@ -12,6 +12,7 @@
             {% if current_user.is_admin() %}
                 <a href="{{ url_for('main.admin') }}">Админка</a>
             {% endif %}
+            <a href="{{ url_for('main.projects') }}">Проекты</a>
             <a href="{{ url_for('auth.logout') }}">Выйти ({{ current_user.username }})</a>
         {% else %}
             <a href="{{ url_for('main.index') }}">Главная</a>

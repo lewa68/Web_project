@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block content %}
+<div style="max-width:900px; margin:0 auto;">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px;">
+        <div>
+            <h2 style="color:{{ project.color }};">{{ project.name }}</h2>
+            <div style="font-size:0.9em; color:#7f8c8d; margin-top:5px;">
+                Автор: {{ project.author.username }}
+            </div>
+            {% if project.description %}
+                <p>{{ project.description }}</p>
+            {% endif %}
+        </div>
+        <div>
+            <a href="{{ url_for('main.new_task_from_project', project_id=project.id) }}" style="display:inline-block; padding:8px 12px; background:#3498db; color:white; text-decoration:none; border-radius:4px; margin-right:10px;">+ Добавить задачу</a>
+            <a href="{{ url_for('main.projects') }}" style="display:inline-block; padding:8px 12px; background:#ecf0f1; text-decoration:none; border-radius:4px;">← Назад к проектам</a>
+        </div>
+    </div>
+
+    <h3>Задачи проекта</h3>
+    
+    {% if tasks %}
+    <div style="display:grid; gap:15px;">
+    {% for task in tasks %}
+        <div class="task-card {% if task.is_overdue() %}task-overdue{% endif %}">
+            <a href="{{ url_for('main.view_task', id=task.id) }}" style="text-decoration:none; color:black;">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                    <div style="flex:1; min-width:0;">
+                        <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+                            <strong style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ task.get_priority_emoji() }} {{ task.title }}</strong>
+                        </div>
+                    </div>
+                    <div style="text-align:right; min-width:120px;">
+                        {% if task.deadline %}
+                            <div style="font-size:0.9em; color:{% if task.is_overdue() %}red{% else %}#7f8c8d{% endif %}; margin-bottom:4px;">
+                                📅 {{ task.deadline.strftime('%d.%m') }}
+                            </div>
+                        {% endif %}
+                        <div style="font-size:0.9em; color:{{ task.get_status_color() }};">
+                            {{ task.get_status_display() }}
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    {% endfor %}
+    </div>
+    {% else %}
+    <p>В проекте пока нет задач.</p>
+    {% endif %}
+</div>
+{% endblock %}

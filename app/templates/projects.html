@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Проекты</h2>
+
+<a href="#" onclick="document.getElementById('new-project-form').classList.remove('hidden'); return false;">+ Новый проект</a>
+
+<div id="new-project-form" class="hidden">
+    <h3>Создать проект</h3>
+    <form method="post" action="{{ url_for('main.new_project') }}">
+        <p><input type="text" name="name" placeholder="Название проекта" required></p>
+        <p><textarea name="description" placeholder="Описание"></textarea></p>
+        
+        <p>
+            <label>Цвет:</label><br>
+            <input type="color" name="color" value="#3498db" style="width:60px; height:40px; border:1px solid #ccc; border-radius:4px; vertical-align:middle;">
+            <span style="vertical-align:middle; margin-left:10px; color:#555;">Выберите цвет</span>
+        </p>
+        
+        <button type="submit">Создать</button>
+        <button type="button" onclick="document.getElementById('new-project-form').classList.add('hidden')">Отмена</button>
+    </form>
+</div>
+
+{% if projects %}
+<ul style="list-style:none; padding:0;">
+{% for p in projects %}
+    <li style="border:1px solid #ddd; margin:10px 0; padding:12px; background:{{ p.color }}10;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <strong style="color:{{ p.color }};">
+                <a href="{{ url_for('main.view_project', id=p.id) }}" style="color:{{ p.color }}; text-decoration:none;">{{ p.name }}</a>
+            </strong>
+            <span>
+                <a href="#" onclick="document.getElementById('edit-project-{{ p.id }}').classList.remove('hidden'); return false;">Редактировать</a>
+                <form method="post" action="{{ url_for('main.delete_project', id=p.id) }}" style="display:inline;">
+                    <button type="submit" onclick="return confirm('Удалить проект?')">Удалить</button>
+                </form>
+            </span>
+        </div>
+        <div style="font-size:0.9em; color:#7f8c8d; margin-top:5px;">
+            Автор: {{ p.author.username }}
+        </div>
+        {% if p.description %}
+            <p>{{ p.description }}</p>
+        {% endif %}
+    </li>
+
+    <div id="edit-project-{{ p.id }}" class="hidden">
+        <form method="post" action="{{ url_for('main.edit_project', id=p.id) }}">
+            <input type="text" name="name" value="{{ p.name }}" required>
+            <textarea name="description">{{ p.description }}</textarea>
+            
+            <p>
+                <label>Цвет:</label><br>
+                <input type="color" name="color" value="{{ p.color }}" style="width:60px; height:40px; border:1px solid #ccc; border-radius:4px; vertical-align:middle;">
+                <span style="vertical-align:middle; margin-left:10px; color:#555;">Выберите цвет</span>
+            </p>
+            
+            <button type="submit">Сохранить</button>
+            <button type="button" onclick="document.getElementById('edit-project-{{ p.id }}').classList.add('hidden')">Отмена</button>
+        </form>
+    </div>
+{% endfor %}
+</ul>
+{% else %}
+<p>Нет проектов. Создайте первый!</p>
+{% endif %}
+{% endblock %}

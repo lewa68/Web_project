@@ -1,56 +1,113 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>Ваши задачи</h2>
-<a href="#" onclick="document.getElementById('new-task-form').style.display='block'">+ Новая задача</a>
+<h2>{% if preselected_project_id %}Создать задачу в проекте{% else %}Ваши задачи{% endif %}</h2>
 
-<div id="new-task-form" style="display:none; margin-top:20px; padding:15px; border:1px solid #ccc; background:#f9f9f9;">
-    <h3>Создать задачу</h3>
+{% if preselected_project_id %}
+    {% set selected_project = preselected_project_id %}
+{% else %}
+    <div style="margin:10px 0;">
+        <a href="#" onclick="document.getElementById('new-task-form').classList.remove('hidden'); return false;">+ Новая задача</a>
+        |
+        <a href="{{ url_for('main.tasks') }}">Все</a>
+        | <a href="{{ url_for('main.tasks', status='todo') }}">К выполнению</a>
+        | <a href="{{ url_for('main.tasks', status='in_progress') }}">В работе</a>
+        | <a href="{{ url_for('main.tasks', status='review') }}">На проверке</a>
+        | <a href="{{ url_for('main.tasks', status='done') }}">Готово</a>
+        | <a href="{{ url_for('main.tasks', overdue='true') }}">Просроченные</a>
+        | <a href="{{ url_for('main.tasks', due_today='true') }}">Сегодня</a>
+    </div>
+{% endif %}
+
+<div id="new-task-form" class="{% if preselected_project_id %}{% else %}hidden{% endif %}">
+    <h3>{% if preselected_project_id %}Создать задачу{% else %}Создать задачу{% endif %}</h3>
     <form method="post" action="{{ url_for('main.new_task') }}">
-        <input type="text" name="title" placeholder="Заголовок" required style="width:100%; padding:8px; margin:5px 0;">
-        <textarea name="description" placeholder="Описание" style="width:100%; padding:8px; margin:5px 0; height:80px;"></textarea>
+        <p><input type="text" name="title" placeholder="Заголовок" required></p>
+        <p><textarea name="description" placeholder="Описание"></textarea></p>
+        
+        <p>
+            <label>Проект:</label>
+            <select name="project_id">
+                <option value="0">Без проекта</option>
+                {% for p in projects %}
+                <option value="{{ p.id }}" {% if preselected_project_id and p.id == preselected_project_id %}selected{% endif %}>{{ p.name }}</option>
+                {% endfor %}
+            </select>
+        </p>
+        
+        <p>
+            <label>Статус:</label>
+            <select name="status">
+                <option value="todo">К выполнению</option>
+                <option value="in_progress">В работе</option>
+                <option value="review">На проверке</option>
+                <option value="done">Готово</option>
+            </select>
+        </p>
+        
+        <p>
+            <label>Приоритет:</label>
+            <select name="priority">
+                <option value="1">🟢 Низкий</option>
+                <option value="2" selected>🟡 Средний</option>
+                <option value="3">🟠 Высокий</option>
+                <option value="4">🔴 Критический</option>
+            </select>
+        </p>
+        
+        <p>
+            <label>Дедлайн:</label>
+            <input type="date" name="deadline">
+        </p>
+        
         <p><strong>Назначить пользователям:</strong></p>
         {% for user in users %}
             {% if current_user.can_assign_to(user) %}
-                <label style="display:block; margin:4px 0;">
-                    <input type="checkbox" name="assignees" value="{{ user.id }}"> {{ user.username }} (L{{ user.access_level }})
+                <label style="display:flex; align-items:center; margin:4px 0;">
+                    <input type="checkbox" name="assignees" value="{{ user.id }}" style="margin-right:8px; width:16px; height:16px;">
+                    {{ user.username }} (L{{ user.access_level }})
                 </label>
             {% endif %}
         {% endfor %}
+        
         <button type="submit" style="margin-top:10px;">Создать задачу</button>
-        <button type="button" onclick="document.getElementById('new-task-form').style.display='none'" style="margin-left:10px;">Отмена</button>
+        {% if not preselected_project_id %}
+            <button type="button" onclick="document.getElementById('new-task-form').classList.add('hidden')">Отмена</button>
+        {% endif %}
     </form>
 </div>
 
-{% if tasks %}
-<ul style="list-style:none; padding:0;">
-{% for task in tasks %}
-    <li style="border:1px solid #ddd; margin:10px 0; padding:12px; background:white;">
-        <div>
-            <strong>{{ task.title }}</strong>
-            {% if task.completed_at %}
-                <span style="color:green; font-weight:bold;">✅ Выполнено: {{ task.completed_at.strftime('%d.%m.%Y %H:%M') }}</span>
-            {% else %}
-                <form method="post" action="{{ url_for('main.complete_task', id=task.id) }}" style="display:inline;">
-                    <button type="submit" style="font-size:0.9em; padding:3px 8px;">Выполнено</button>
-                </form>
-            {% endif %}
+{% if not preselected_project_id %}
+    {% if tasks %}
+    <div style="display:grid; gap:15px;">
+    {% for task in tasks %}
+        <div class="task-card {% if task.is_overdue() %}task-overdue{% endif %}">
+            <a href="{{ url_for('main.view_task', id=task.id) }}" style="text-decoration:none; color:black;">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                    <div style="flex:1; min-width:0;">
+                        <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+                            <span style="color:{% if task.project %}{{ task.project.color }}{% else %}#7f8c8d{% endif %};">
+                                {% if task.project %}[{{ task.project.name }}]{% endif %}
+                            </span>
+                            <strong style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ task.get_priority_emoji() }} {{ task.title }}</strong>
+                        </div>
+                    </div>
+                    <div style="text-align:right; min-width:120px;">
+                        {% if task.deadline %}
+                            <div style="font-size:0.9em; color:{% if task.is_overdue() %}red{% else %}#7f8c8d{% endif %}; margin-bottom:4px;">
+                                📅 {{ task.deadline.strftime('%d.%m') }}
+                            </div>
+                        {% endif %}
+                        <div style="font-size:0.9em; color:{{ task.get_status_color() }};">
+                            {{ task.get_status_display() }}
+                        </div>
+                    </div>
+                </div>
+            </a>
         </div>
-        {% if task.description %}
-            <p style="margin:8px 0; color:#555;">{{ task.description }}</p>
-        {% endif %}
-        <p style="font-size:0.9em; color:#777;">Автор: {{ task.author.username }}</p>
-        <p style="font-size:0.9em; color:#777;">
-            Назначено:
-            {% for u in task.assignees %}
-                {{ u.username }} (L{{ u.access_level }}){% if not loop.last %}, {% endif %}
-            {% else %}
-                никому
-            {% endfor %}
-        </p>
-    </li>
-{% endfor %}
-</ul>
-{% else %}
-<p>Нет задач.</p>
+    {% endfor %}
+    </div>
+    {% else %}
+    <p>Нет задач.</p>
+    {% endif %}
 {% endif %}
 {% endblock %}

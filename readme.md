@@ -34,12 +34,15 @@
    git clone https://github.com/lewa68/Web_project.git
    cd task_manager
 2. Создайте виртуальное окружение и активируйте его:
+  ```bash
     python -m venv venv
     venv\Scripts\activate  # Windows
     source venv/bin/activate  # Linux/macOS
 3. Установите зависимости:
+  ```bash
     pip install -r requirements.txt
 4. Запустите приложение:
+  ```bash
     python run.py
 
 риложение будет доступно по адресу: http://localhost:5000
@@ -54,15 +57,15 @@
 - `DELETE /api/tasks/<id>` — удалить задачу
 - `PUT /api/tasks/<id>/complete` — отметить задачу как выполненную
 
-### Примеры запросов
-```bash
-curl -X GET http://localhost:5000/api/tasks -H "Cookie: session=..."
-curl -X POST http://localhost:5000/api/tasks -H "Content-Type: application/json" -d '{"title": "Новая задача", "description": "Описание задачи"}'
-curl -X PUT http://localhost:5000/api/tasks/1 -H "Content-Type: application/json" -d '{"title": "Обновленная задача", "description": "Новое описание"}'
-curl -X DELETE http://localhost:5000/api/tasks/1
-curl -X PUT http://localhost:5000/api/tasks/1/complete
+  ### Примеры запросов
+  ```bash
+  curl -X GET http://localhost:5000/api/tasks -H "Cookie: session=..."
+  curl -X POST http://localhost:5000/api/tasks -H "Content-Type: application/json" -d '{"title": "Новая задача", "description": "Описание задачи"}'
+  curl -X PUT http://localhost:5000/api/tasks/1 -H "Content-Type: application/json" -d '{"title": "Обновленная задача", "description": "Новое описание"}'
+  curl -X DELETE http://localhost:5000/api/tasks/1
+  curl -X PUT http://localhost:5000/api/tasks/1/complete
 
-Коды ответов
+### Коды ответов
 200 OK — успешный запрос (GET, PUT)
 201 Created — задача успешно создана
 400 Bad Request — ошибка валидации данных
@@ -70,29 +73,31 @@ curl -X PUT http://localhost:5000/api/tasks/1/complete
 404 Not Found — задача не найдена
 302 Found — перенаправление (для неавторизованных)
 
-Тестирование:
-  python -m pytest tests/
+### Тестирование
+```bash
+python -m pytest tests/
 
-Структура проекта:
-  Web_project/
-├── app/
-│   ├── __init__.py
-│   ├── models.py
-│   ├── auth.py
-│   ├── main/
-│   │   ├── __init__.py
-│   │   └── routes.py
-│   ├── api/
-│   │   ├── __init__.py
-│   │   └── tasks.py
-│   ├── templates/
-│   └── static/
-├── tests/
-│   ├── __init__.py
-│   └── test_api.py
-├── requirements.txt
-├── README.md
-└── run.py
+  ### Структура проекта:
+    ```bash
+      Web_project/
+    ├── app/
+    │   ├── __init__.py
+    │   ├── models.py
+    │   ├── auth.py
+    │   ├── main/
+    │   │   ├── __init__.py
+    │   │   └── routes.py
+    │   ├── api/
+    │   │   ├── __init__.py
+    │   │   └── tasks.py
+    │   ├── templates/
+    │   └── static/
+    ├── tests/
+    │   ├── __init__.py
+    │   └── test_api.py
+    ├── requirements.txt
+    ├── README.md
+    └── run.py
 
 При первом запуске автоматически создаётся администратор:
 

@@ -1,9 +1,161 @@
-body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f5f5f5; }
-nav { background: #2c3e50; padding: 12px; }
-nav a { color: white; margin-right: 20px; text-decoration: none; font-weight: bold; }
-nav a:hover { text-decoration: underline; }
-main { max-width: 900px; margin: 20px auto; padding: 0 15px; }
-.flash { background: #fff3cd; border: 1px solid #ffeaa7; padding: 10px; margin-bottom: 20px; border-radius: 4px; color: #856404; }
-input, textarea, button { margin: 5px 0; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
-button { background: #007bff; color: white; border: none; cursor: pointer; border-radius: 4px; }
-button:hover { background: #0056b3; }
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #f5f5f5;
+}
+nav {
+    background: #2c3e50;
+    padding: 12px;
+}
+nav a {
+    color: white;
+    margin-right: 20px;
+    text-decoration: none;
+    font-weight: bold;
+}
+nav a:hover {
+    text-decoration: underline;
+}
+main {
+    max-width: 900px;
+    margin: 20px auto;
+    padding: 0 15px;
+}
+.flash {
+    background: #fff3cd;
+    border: 1px solid #ffeaa7;
+    padding: 10px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+    color: #856404;
+}
+input, textarea, button, select {
+    margin: 5px 0;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 100%;
+    box-sizing: border-box;
+}
+button {
+    background: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+    width: auto;
+}
+button:hover {
+    background: #0056b3;
+}
+ul {
+    list-style: none;
+    padding: 0;
+}
+li {
+    margin: 10px 0;
+}
+form {
+    margin: 0;
+}
+textarea {
+    height: 80px;
+}
+
+.task-form {
+    display: none;
+    margin-top: 20px;
+    padding: 15px;
+    border: 1px solid #ccc;
+    background: #f9f9f9;
+}
+
+.project-form {
+    display: none;
+    margin-top: 20px;
+    padding: 15px;
+    border: 1px solid #ccc;
+    background: #f9f9f9;
+}
+
+.edit-project {
+    display: none;
+    margin-top: 10px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    background: #f0f0f0;
+}
+
+.subtask-list {
+    margin-top: 10px;
+    padding: 8px;
+    background: #f8f9fa;
+    border-radius: 4px;
+}
+
+.comment-section {
+    margin-top: 15px;
+    padding-top: 10px;
+    border-top: 1px dashed #eee;
+}
+
+.comment-item {
+    margin-bottom: 8px;
+    padding: 6px;
+    background: #f8f9fa;
+    border-radius: 4px;
+}
+
+.task-item {
+    border: 1px solid #ddd;
+    margin: 10px 0;
+    padding: 12px;
+    background: white;
+}
+
+.task-overdue {
+    border-left: 5px solid red;
+}
+
+.project-item {
+    border: 1px solid #ddd;
+    margin: 10px 0;
+    padding: 12px;
+    background: #f9f9f9;
+}
+
+.project-item:hover {
+    background: #f0f0f0;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.subtask-checkbox {
+    margin-right: 5px;
+    vertical-align: middle;
+}
+
+.subtask-item input[type="checkbox"] {
+    margin: 0;
+    padding: 0;
+    width: 16px;
+    height: 16px;
+    vertical-align: middle;
+}
+
+.task-card {
+    background: white;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+.task-card:hover {
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+.task-overdue {
+    border-left: 4px solid red;
+}
