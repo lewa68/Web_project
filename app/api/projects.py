@@ -1,8 +1,7 @@
-from flask import Blueprint, jsonify, request
+from flask import jsonify, request
 from flask_login import login_required, current_user
 from app.models import Project, db
-
-api = Blueprint('projects', __name__)
+from . import api
 
 @api.route('/projects', methods=['GET'])
 @login_required

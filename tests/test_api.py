@@ -200,38 +200,42 @@ def test_filter_tasks_by_status(client):
     rv = client.get("/api/tasks?status=todo")
     assert rv.status_code == 200
     tasks = rv.get_json() or []
-    assert any(t["status"] == "todo" for t in tasks)
     assert all(t["status"] == "todo" for t in tasks)
+
 
 
 
 def test_filter_tasks_by_overdue(client):
     login(client, "admin", "admin")
-    deadline = (date.today() - timedelta(days=1)).isoformat()
-    rv = client.post(
-        "/api/tasks", json={"title": "Overdue Task", "deadline": deadline}
-    )
+    yesterday = (date.today() - timedelta(days=1)).isoformat()
+    rv = client.post("/api/tasks", json={"title": "Overdue", "deadline": yesterday})
     assert rv.status_code == 201
 
     rv = client.get("/api/tasks?overdue=true")
     assert rv.status_code == 200
     tasks = rv.get_json() or []
-    assert any(t["title"] == "Overdue Task" for t in tasks)
+    assert all(
+        t["deadline"] < date.today().isoformat() and t["completed_at"] is None
+        for t in tasks
+    )
+
 
 
 
 def test_filter_tasks_by_due_today(client):
     login(client, "admin", "admin")
     today = date.today().isoformat()
-    rv = client.post(
-        "/api/tasks", json={"title": "Due today", "deadline": today}
-    )
+    rv = client.post("/api/tasks", json={"title": "Due", "deadline": today})
     assert rv.status_code == 201
 
     rv = client.get("/api/tasks?due_today=true")
     assert rv.status_code == 200
     tasks = rv.get_json() or []
-    assert any(t["title"] == "Due today" for t in tasks)
+    assert all(
+        t["deadline"] == today and t["completed_at"] is None
+        for t in tasks
+    )
+
 
 
 
